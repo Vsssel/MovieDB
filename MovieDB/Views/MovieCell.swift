@@ -45,7 +45,9 @@ class MovieCell: UICollectionViewCell {
     }
     
     func configure(with movie: Movie) {
-        movieImageView.image = UIImage(named: movie.image)
-        movieTitleLabel.text = movie.name
+        movieTitleLabel.text = movie.title
+        NetworkingManager.shared.loadImage(posterPath: movie.posterPath) { [weak self] image in
+            self?.movieImageView.image = image
+        }
     }
 }

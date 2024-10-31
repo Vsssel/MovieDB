@@ -3,21 +3,25 @@ import SnapKit
 
 class HomeViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
-    let movies = [
-        Movie(image: "movieImage", name: "Uncharted"),
-        Movie(image: "movieImage", name: "Inception"),
-        Movie(image: "movieImage", name: "Interstellar"),
-        Movie(image: "movieImage", name: "The Matrix")
-    ]
-    
     private var collectionView: UICollectionView!
+    private var movies: [Movie] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         title = "MovieDB"
-        
         setupCollectionView()
+        getMovies()
+    }
+    
+    private func getMovies() {
+        NetworkingManager.shared.getMovies { [weak self] movies in
+            guard let self = self else { return }
+            DispatchQueue.main.async {
+                self.movies = movies
+                self.collectionView.reloadData()
+            }
+        }
     }
     
     private func setupCollectionView() {
@@ -36,7 +40,6 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
         
         collectionView.snp.makeConstraints { make in
             make.edges.equalTo(view.safeAreaLayoutGuide)
-            make.leading.trailing.equalTo(view.safeAreaLayoutGuide)
         }
     }
     
@@ -53,9 +56,19 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
         return cell
     }
     
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let selectedMovie = movies[indexPath.item]
+        NetworkingManager.shared.getMovieDetails(id: selectedMovie.id) { [weak self] movieDetail in
+            guard let self = self else { return }
+            DispatchQueue.main.async {
+                let detailVC = MovieDetailViewController(movieDetail: movieDetail)
+                self.navigationController?.pushViewController(detailVC, animated: true)
+            }
+        }
+    }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width = (collectionView.frame.width - 16)
+        let width = collectionView.frame.width - 16
         return CGSize(width: width, height: 500)
     }
 }
