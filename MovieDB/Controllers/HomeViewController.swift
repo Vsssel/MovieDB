@@ -1,36 +1,61 @@
-//
-//  ViewController.swift
-//  MovieDB
-//
-//  Created by Assel Artykbay on 31.10.2024.
-//
-
 import UIKit
 import SnapKit
 
-class HomeViewController: UIViewController {
-    private let movieCard: HomeView = {
-        let image = UIImage(named: "movieImage")
-        let movieTitle = "Uncharted"
-        return HomeView(image: image, title: movieTitle)
-    }()
+class HomeViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    
+    let movies = [
+        Movie(image: "movieImage", name: "Uncharted"),
+        Movie(image: "movieImage", name: "Inception"),
+        Movie(image: "movieImage", name: "Interstellar"),
+        Movie(image: "movieImage", name: "The Matrix")
+    ]
+    
+    private var collectionView: UICollectionView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        initialize()
-    }
-    
-    private func initialize() {
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         title = "MovieDB"
         
-        view.addSubview(movieCard)
-        movieCard.snp.makeConstraints { make in
-            make.center.equalToSuperview()
-            make.leading.equalTo(view.safeAreaLayoutGuide.snp.leading).offset(16)
-            make.trailing.equalTo(view.safeAreaLayoutGuide.snp.trailing).offset(-16);
-            make.height.equalTo(500)
+        setupCollectionView()
+    }
+    
+    private func setupCollectionView() {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .vertical
+        layout.minimumLineSpacing = 5
+        layout.minimumInteritemSpacing = 5
+        
+        collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.backgroundColor = .clear
+        collectionView.register(MovieCell.self, forCellWithReuseIdentifier: MovieCell.identifier)
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        
+        view.addSubview(collectionView)
+        
+        collectionView.snp.makeConstraints { make in
+            make.edges.equalTo(view.safeAreaLayoutGuide)
+            make.leading.trailing.equalTo(view.safeAreaLayoutGuide)
         }
     }
- }
-
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return movies.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MovieCell.identifier, for: indexPath) as? MovieCell else {
+            return UICollectionViewCell()
+        }
+        let movie = movies[indexPath.item]
+        cell.configure(with: movie)
+        return cell
+    }
+    
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let width = (collectionView.frame.width - 16)
+        return CGSize(width: width, height: 500)
+    }
+}

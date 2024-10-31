@@ -6,3 +6,8 @@
 //
 
 import Foundation
+
+struct Movie {
+    var image: String;
+    var name: String;
+}
