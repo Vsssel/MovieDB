@@ -34,8 +34,12 @@ class CastCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configure(with cast: ProductionCompany) {
-        imageView.image = UIImage(named: cast.logoPath ?? "")
+    func configure(with cast: Cast) {
         nameLabel.text = cast.name
+        if let profilePath = cast.profilePath {
+            NetworkingManager.shared.loadImage(posterPath: profilePath) { [weak self] image in
+                self?.imageView.image = image
+            }
+        }
     }
 }

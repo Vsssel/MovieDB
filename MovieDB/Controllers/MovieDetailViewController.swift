@@ -12,6 +12,7 @@ class MovieDetailViewController: UIViewController, UICollectionViewDataSource, U
 
     private var movieDetail: MovieDetail
     private var collectionView: UICollectionView!
+    private var casts: [Cast] = []
     
     private lazy var movieDetailView: MovieDetailView = {
         return MovieDetailView(movieDetail: movieDetail)
@@ -20,6 +21,10 @@ class MovieDetailViewController: UIViewController, UICollectionViewDataSource, U
     init(movieDetail: MovieDetail) {
         self.movieDetail = movieDetail
         super.init(nibName: nil, bundle: nil)
+        NetworkingManager.shared.getMovieDetailsCast(id: movieDetail.id){ casts in
+            self.casts = casts
+            self.collectionView.reloadData()
+        }
     }
 
     required init?(coder: NSCoder) {
@@ -61,21 +66,21 @@ class MovieDetailViewController: UIViewController, UICollectionViewDataSource, U
     
     // MARK: - UICollectionViewDataSource
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return movieDetail.productionCompanies.count
+        return casts.count
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CastCell", for: indexPath) as! CastCollectionViewCell
-        let cast = movieDetail.productionCompanies[indexPath.row]
+        let cast = casts[indexPath.row]
         cell.configure(with: cast)
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let selectedActor = movieDetail.productionCompanies[indexPath.item]
-//        print(selectedActor)
-//        let actorViewController = ActorViewController(actor: selectedActor)
-//        navigationController?.pushViewController(actorViewController, animated: true)
+        let selectedActor = casts[indexPath.item]
+        print(selectedActor)
+        let actorViewController = ActorViewController(id: selectedActor.id!)
+        navigationController?.pushViewController(actorViewController, animated: true)
     }
 }
 

@@ -114,8 +114,8 @@ class MovieDetailView: UIView {
         
         let genreStackView = UIStackView(arrangedSubviews: genreLabels)
         genreStackView.axis = .horizontal
-        genreStackView.spacing = 8
-        genreStackView.distribution = .fillEqually
+        genreStackView.spacing = 2
+        genreStackView.distribution = .fill
         
         let ratingStackView = UIStackView(arrangedSubviews: ratingStarViews)
         ratingStackView.axis = .horizontal
@@ -199,7 +199,9 @@ class MovieDetailView: UIView {
             label.layer.masksToBounds = true
             label.backgroundColor = .blue
             label.textColor = .white
+            
             return label
+
         }
     }
 

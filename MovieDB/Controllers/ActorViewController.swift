@@ -1,23 +1,19 @@
-//
-//  ActorViewController.swift
-//  MovieDB
-//
-//  Created by Assel Artykbay on 31.10.2024.
-//
-
 import UIKit
 
 class ActorViewController: UIViewController {
     
-    private var actor: Actor
-    
-    private lazy var actorInfoView: ActorInfoView = {
-        return ActorInfoView(actorInfo: actor)
-    }()
+    private var actor: Actor?
+    private var actorInfoView: ActorInfoView?
 
-    init(actor: Actor) {
-        self.actor = actor
+    init(id: Int) {
         super.init(nibName: nil, bundle: nil)
+        NetworkingManager.shared.getActorDetails(id: id) { [weak self] actor in
+            guard let self = self else { return }
+            self.actor = actor
+            DispatchQueue.main.async {
+                self.setupActorDetails()
+            }
+        }
     }
 
     required init?(coder: NSCoder) {
@@ -27,16 +23,19 @@ class ActorViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        setupActorDetails()
     }
     
     private func setupActorDetails() {
+        guard let actor = actor else { return }
         title = "Actor"
-        view.addSubview(actorInfoView)
         
+
+        let actorInfoView = ActorInfoView(actorInfo: actor)
+        view.addSubview(actorInfoView)
         actorInfoView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+        
+        self.actorInfoView = actorInfoView
     }
 }
-

@@ -90,10 +90,12 @@ class ActorInfoView: UIView {
     }
 
     private func setUpActorInfo(_ actorInfo: Actor) {
-        actorImage.image = UIImage(named: actorInfo.image)
+        NetworkingManager.shared.loadImage(posterPath: actorInfo.profilePath!) { [weak self] image in
+            self!.actorImage.image = image
+        }
         actorName.text = actorInfo.name
-        actorBornDate.text = actorInfo.bornDate
-        actorBornPlace.text = actorInfo.bornPlace
+        actorBornDate.text = actorInfo.birthday
+        actorBornPlace.text = actorInfo.placeOfBirth
         
         let stack = UIStackView(arrangedSubviews: [actorImage, actorName, actorBornDate, actorBornPlace])
         stack.axis = .vertical
@@ -116,7 +118,7 @@ class ActorInfoView: UIView {
     }
 
     private func setupActorBio(_ actorInfo: Actor) {
-        bioLabel.text = actorInfo.bio
+        bioLabel.text = actorInfo.biography
         let bioTitle = UILabel()
         bioTitle.text = "Bio"
         bioTitle.font = UIFont.systemFont(ofSize: 18, weight: .bold)

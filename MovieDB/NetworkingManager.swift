@@ -67,6 +67,52 @@ extension NetworkingManager {
             task.resume()
         }
     
+    func getMovieDetailsCast(id: Int, completion: @escaping ([Cast]) -> Void) {
+            urlComponents.path = "/3/movie/\(id)/credits"
+            guard let url = urlComponents.url else { return }
+            
+            let task = session.dataTask(with: url) { data, response, error in
+                guard let data, let response else {
+                    print(error?.localizedDescription ?? "No error description")
+                    return
+                }
+                do {
+                    let datas = try JSONDecoder().decode(Casts.self, from: data)
+                    DispatchQueue.main.async {
+                        completion(datas.cast)
+                    }
+                    
+                    print(datas)
+                    
+                } catch {
+                    print(error)
+                }
+            }
+            task.resume()
+        }
+    
+    func getActorDetails(id: Int, completion: @escaping (Actor) -> Void) {
+            urlComponents.path = "/3/person/\(id)"
+            guard let url = urlComponents.url else { return }
+            
+            let task = session.dataTask(with: url) { data, response, error in
+                guard let data, let response else {
+                    print(error?.localizedDescription ?? "No error description")
+                    return
+                }
+                do {
+                    let datas = try JSONDecoder().decode(Actor.self, from: data)
+                    DispatchQueue.main.async {
+                        completion(datas)
+                    }
+                    
+                } catch {
+                    print(error)
+                }
+            }
+            task.resume()
+        }
+    
     func loadImage(posterPath: String, completion: @escaping (UIImage?) -> Void) {
         guard let url = URL(string: imageUrl + posterPath) else {
             completion(nil)
